@@ -92,10 +92,13 @@ samples.nested() 的 rows=[[10,20],[],[null,10]], base=7 对应
 * status(id) -> {id,name,revision,state} 的独立字典。
 * result(id) -> 独立业务值；queued 报 pending；failed 重抛原 code/message。
 
-run 当前一次性解析完整参数、执行完整数组并序列化完整结果，在一个事务中
+run 一次性解析完整参数、执行完整数组并序列化完整结果，在一个事务中
 发布终态。未优化的整数组路径正确，但内存随输入、数组中间值和结果增长。
 业务错误也在该事务中发布；其他异常回滚，任务保持 queued，不发布半个结果。
 关闭连接后读取结果需重新打开 Database。
+
+分步运行时（resumable.py 与 Jobs.step）见 RESUMABLE.md 与 STATE_HANDOFF.md；
+run 在同一事务内驱动该续接栈以接续已暂停任务，其一次性语义与终态约定不变。
 
 WarehouseError 提供 code 与 message。invalid_plan 表示计划结构或名字无效；
 invalid_value 表示业务值越界；invalid_params 表示参数集合/位置数量错误；
